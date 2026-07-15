@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ORGANIZER
+  PARTICIPANT
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  FINISHED
+  CANCELLED
+}
+
+enum TicketStatus {
+  VALID
+  USED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  events        Event[]
+  purchases     Purchase[]
+  tickets       Ticket[]
+
+  @@map("users")
+}
+
+model Category {
+  id        String @id @default(cuid())
+  name      String @unique
+
+  events    Event[]
+
+  @@map("categories")
+}
+
+model Event {
+  id            String @id @default(cuid())
+
+  organizerId   String
+  organizer     User @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id])
+
+  name          String
+  description   String
+
+  imageUrl      String?
+
+  city          String
+  address       String
+
+  eventDate     DateTime
+
+  status        EventStatus @default(DRAFT)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  ticketTypes   TicketType[]
+
+  @@index([organizerId])
+  @@index([categoryId])
+  @@index([eventDate])
+  @@index([city])
+
+  @@map("events")
+}
+
+model TicketType {
+  id              String @id @default(cuid())
+
+  eventId         String
+  event           Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  name            String
+
+  price           Decimal @db.Decimal(10, 2)
+
+  quantityTotal   Int
+  quantitySold    Int @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tickets         Ticket[]
+
+  @@index([eventId])
+
+  @@map("ticket_types")
+}
+
+model Purchase {
+  id          String @id @default(cuid())
+
+  buyerId     String
+  buyer        User @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+
+  total       Decimal @db.Decimal(10, 2)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tickets     Ticket[]
+
+  @@index([buyerId])
+
+  @@map("purchases")
+}
+
+model Ticket {
+  id              String @id @default(cuid())
+
+  ticketTypeId    String
+  ticketType      TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+
+  purchaseId      String
+  purchase        Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+
+  participantId   String
+  participant     User @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  code            String @unique
+
+  status          TicketStatus @default(VALID)
+
+  checkedInAt     DateTime?
+
+  createdAt       DateTime @default(now())
+
+  @@index([ticketTypeId])
+  @@index([purchaseId])
+  @@index([participantId])
+  @@index([status])
+
+  @@map("tickets")
+}
