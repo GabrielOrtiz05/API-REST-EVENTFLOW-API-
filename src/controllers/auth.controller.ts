@@ -1,4 +1,3 @@
-// src/controllers/auth.controller.ts
 import { NextFunction, Request, Response } from "express";
 import { authService } from "../services/auth.service";
 import { loginSchema, registerSchema } from "../schemas/auth.schema";
