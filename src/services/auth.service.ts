@@ -7,9 +7,11 @@ import { LoginInput, RegisterInput } from "../schemas/auth.schema";
 
 function generateToken(userId: string, role: string) {
   const secret = process.env.JWT_SECRET;
+
   if (!secret) {
     throw new AppError("JWT_SECRET não configurado no .env", 500);
   }
+
   return jwt.sign({ sub: userId, role }, secret, { expiresIn: "15m" });
 }
 
