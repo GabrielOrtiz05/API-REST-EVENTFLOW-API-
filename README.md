@@ -1,6 +1,17 @@
 # EventFlow API
 
-API REST para gerenciamento de eventos e venda de ingressos, com autenticação por papéis, controle de estoque e check-in por código único.
+API REST para gerenciamento de eventos e venda de ingressos — com autenticação
+por papéis, controle de estoque sem overselling (mesmo sob concorrência) e
+check-in por código único.
+
+Projeto pessoal de portfólio, construído para praticar arquitetura em camadas
+(controller → service → repository) e resolver problemas reais de concorrência
+em sistemas de venda com estoque limitado.
+
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
+![Node.js](https://img.shields.io/badge/Node.js-20+-green)
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-yellow)
+![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
 ## Status do projeto
 
@@ -46,13 +57,13 @@ API REST para gerenciamento de eventos e venda de ingressos, com autenticação 
 
 ```
 src/
-├── controllers/    # recebem a requisição HTTP e chamam os services
-├── services/       # regras de negócio
-├── repositories/   # acesso ao banco de dados via Prisma
-├── middlewares/     # autenticação, validação, tratamento de erros
-├── routes/          # definição das rotas
-├── schemas/          # validação de entrada (Zod)
-├── utils/            # funções auxiliares (ex: cliente Prisma)
+├── controllers/   # recebem a requisição HTTP e chamam os services
+├── services/      # regras de negócio
+├── repositories/  # acesso ao banco de dados via Prisma
+├── middlewares/    # autenticação, validação, tratamento de erros
+├── routes/         # definição das rotas
+├── schemas/        # validação de entrada (Zod)
+├── utils/           # funções auxiliares (ex: cliente Prisma)
 ├── app.ts            # monta o Express (middlewares + rotas)
 └── server.ts          # ponto de entrada, sobe o servidor
 ```
@@ -91,13 +102,18 @@ O servidor sobe por padrão em `http://localhost:3000`.
 ### Variáveis de ambiente (`.env`)
 
 ```
-DATABASE_URL="postgresql://postgres:senha123@localhost:5432/eventflow?schema=public"
-JWT_SECRET="sua_chave_secreta"
-JWT_REFRESH_SECRET="outra_chave_secreta"
+DATABASE_URL="postgresql://postgres:<sua_senha_aqui>@localhost:5432/eventflow?schema=public"
+JWT_SECRET="<sua_chave_secreta>"
+JWT_REFRESH_SECRET="<outra_chave_secreta>"
 PORT=3000
 ```
 
+> ⚠️ Nunca use os valores de exemplo acima em produção. Gere chaves fortes e
+> únicas para `JWT_SECRET` e `JWT_REFRESH_SECRET`.
+
 ## Endpoints disponíveis
+
+> Novos endpoints serão documentados aqui conforme forem implementados.
 
 ### Autenticação
 
@@ -113,7 +129,7 @@ POST /auth/register
 {
   "nome": "Gabriel",
   "email": "gabriel@teste.com",
-  "senha": "123456"
+  "senha": "SuaSenhaForte123!"
 }
 ```
 
@@ -137,6 +153,17 @@ Abre uma interface visual (geralmente em `http://localhost:5555`) para consultar
 - **Event** (1) ──< (N) **TicketType** — um evento tem vários tipos de ingresso
 - **TicketType** (1) ──< (N) **Ticket** — cada tipo gera vários ingressos vendidos
 - **User** (1) ──< (N) **Ticket** — um participante compra vários ingressos
+
+## Outros projetos
+
+Confira também o [Fogo-Brasa](https://github.com/GabrielOrtiz05) — sistema de
+gestão para churrascarias com backend em Node.js/TypeScript, PostgreSQL e
+deploy em produção.
+
+## Licença
+
+Este projeto está sob a licença MIT — sinta-se livre para estudar e usar como
+referência.
 
 ## Autor
 
