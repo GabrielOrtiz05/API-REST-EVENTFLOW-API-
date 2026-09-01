@@ -11,6 +11,10 @@ export const categoryRepository = {
     return prisma.category.findUnique({ where: { name } });
   },
 
+  findById(id: string) {
+    return prisma.category.findUnique({ where: { id } });
+  },
+
   create(data: CreateCategoryInput) {
     return prisma.category.create({ data });
   },
